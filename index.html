@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Void IQ Test</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rubik+Glitch&display=swap');
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to bottom right, #000000, #111111);
+      color: #00FF88;
+      text-align: center;
+      padding: 2em;
+    }
+    .hidden { display: none; }
+    button {
+      background: #00FF88;
+      color: #000;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 6px;
+      font-family: 'Rubik Glitch', cursive;
+    }
+    input[type="text"] {
+      padding: 5px;
+      margin-top: 10px;
+      width: 80%;
+      border-radius: 4px;
+      border: 1px solid #00FF88;
+      background: #111;
+      color: #0f0;
+      font-family: 'Orbitron', sans-serif;
+    }
+    select {
+      background: #111;
+      color: #00FF88;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    .history-section {
+      margin-top: 2em;
+      padding: 1em;
+      border-top: 2px solid #00FF88;
+    }
+    .question-block {
+      background: #1a1a1a;
+      padding: 1em;
+      margin: 1em auto;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    audio { display: none; }
+  </style>
+</head>
+<body>
+  <h1>💀 VOID IQ TEST 💀</h1>
+  <div>
+    <label>Enter your cursed username (can’t be changed):</label><br>
+    <input type="text" id="username" placeholder="e.g., LordPickle" /><br>
+    <label>Pick your chaos theme:</label><br>
+    <select id="themePicker">
+      <option value="default">Dark Void</option>
+      <option value="pink">Hot Pink Chaos</option>
+      <option value="matrix">Matrix Rain</option>
+      <option value="comic">Comic Sans Hell</option>
+    </select>
+    <button onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <div id="quizContainer" class="hidden">
+    <div id="quiz"></div>
+    <button onclick="submitQuiz()" id="submitBtn">Submit</button>
+    <button onclick="retakeQuiz()" class="hidden" id="retakeBtn">Retake Quiz</button>
+    <div id="result" class="hidden"></div>
+  </div>
+
+  <div class="history-section">
+    <h2>🧠 Your Past Attempts</h2>
+    <div id="history"></div>
+
+    <h2>🏆 Highest IQs</h2>
+    <div id="highScores"></div>
+
+    <h2>💀 Lowest IQs</h2>
+    <div id="lowScores"></div>
+  </div>
+
+  <script>
+    const sound = new Audio('https://www.myinstants.com/media/sounds/vine-boom.mp3');
+    const questions = [
+      { q: "How many ducks does it take to screw in a lightbulb?", options: ["7", "Banana", "None, ducks don't do that", "Only on Tuesdays"], correct: 2 },
+      { q: "What's the color of noise in a vacuum?", options: ["Ultraviolet", "Silence", "42", "Depends on the mood"], correct: 1 },
+      { q: "Type the meaning of life:", input: true, correct: "42" },
+      { q: "If a tree falls in the forest and no one hears it, how many toes does it have?", options: ["10", "0", "Depends on the forest", "Trees don't have toes"], correct: 3 },
+      { q: "Write something only a genius would say:", input: true, correct: "something only a genius would say" },
+      { q: "How many hot dogs can fit in the sun?", options: ["All of them", "None", "What is a sun?", "17"], correct: 0 },
+      { q: "If your reflection winks at you, what do you do?", options: ["Panic", "Wink back", "Call NASA", "Join it"], correct: 1 },
+      { q: "Spell 'IQ' backwards:", input: true, correct: "QI" },
+      { q: "What weighs more, a kilogram of feathers or a kilogram of steel?", options: ["Feathers", "Steel", "Same", "Depends on gravity"], correct: 2 },
+      { q: "What's the opposite of purple if you're underwater?", options: ["Green", "Orange", "Octopus", "Yes"], correct: 3 }
+    ];
+
+    let selected = [], username = "";
+
+    function startQuiz() {
+      const nameInput = document.getElementById("username");
+      if (!nameInput.value.trim()) {
+        alert("You must enter a cursed name first.");
+        return;
+      }
+      if (localStorage.getItem("voidIQ_name")) {
+        username = localStorage.getItem("voidIQ_name");
+      } else {
+        username = nameInput.value.trim();
+        localStorage.setItem("voidIQ_name", username);
+      }
+      applyTheme();
+      document.getElementById("quizContainer").classList.remove("hidden");
+      generateQuiz();
+      renderHistory();
+    }
+
+    function applyTheme() {
+      const theme = document.getElementById("themePicker").value;
+      switch (theme) {
+        case "pink": document.body.style.background = "#ff69b4"; break;
+        case "matrix": document.body.style.background = "#0f0"; document.body.style.color = "#000"; break;
+        case "comic": document.body.style.fontFamily = "Comic Sans MS, cursive, sans-serif"; break;
+        default: document.body.style.background = "#111"; document.body.style.color = "#0f0"; break;
+      }
+    }
+
+    function generateQuiz() {
+      document.getElementById("quiz").innerHTML = "";
+      document.getElementById("result").classList.add("hidden");
+      document.getElementById("submitBtn").classList.remove("hidden");
+      document.getElementById("retakeBtn").classList.add("hidden");
+
+      selected = [];
+      const quizDiv = document.getElementById("quiz");
+      const indices = [...Array(questions.length).keys()].sort(() => 0.5 - Math.random()).slice(0, 5);
+
+      indices.forEach(i => {
+        const q = questions[i];
+        selected.push(i);
+        const container = document.createElement("div");
+        container.classList.add("question-block");
+        container.innerHTML = `<p>${q.q}</p>`;
+
+        if (q.input) {
+          container.innerHTML += `<input type="text" id="q${i}">`;
+        } else {
+          q.options.forEach((opt, j) => {
+            container.innerHTML += `<label><input type="radio" name="q${i}" value="${j}" onclick="sound.play()"> ${opt}</label><br>`;
+          });
+        }
+        quizDiv.appendChild(container);
+      });
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      const userAnswers = [];
+      selected.forEach(i => {
+        const q = questions[i];
+        if (q.input) {
+          const answer = document.getElementById(`q${i}`).value.trim();
+          userAnswers.push({ q: q.q, a: answer });
+          if (answer.toLowerCase() === q.correct.toLowerCase()) score++;
+        } else {
+          const choices = document.getElementsByName(`q${i}`);
+          for (let c of choices) {
+            if (c.checked) {
+              userAnswers.push({ q: q.q, a: q.options[c.value] });
+              if (parseInt(c.value) === q.correct) score++;
+              break;
+            }
+          }
+        }
+      });
+
+      const iq = 80 + score * 10;
+
+      const history = JSON.parse(localStorage.getItem("voidIQHistory") || "[]");
+      history.push({ name: username, score: iq, answers: userAnswers });
+      localStorage.setItem("voidIQHistory", JSON.stringify(history));
+
+      document.getElementById("result").classList.remove("hidden");
+      document.getElementById("submitBtn").classList.add("hidden");
+      document.getElementById("retakeBtn").classList.remove("hidden");
+      document.getElementById("result").innerHTML = `<h2>${username}'s Void IQ is: ${iq}</h2>`;
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const container = document.getElementById("history");
+      const high = document.getElementById("highScores");
+      const low = document.getElementById("lowScores");
+
+      const history = JSON.parse(localStorage.getItem("voidIQHistory") || "[]");
+      container.innerHTML = "";
+      history.filter(h => h.name === username).slice(-5).reverse().forEach(entry => {
+        const div = document.createElement("div");
+        div.classList.add("question-block");
+        div.innerHTML = `<h3>IQ: ${entry.score}</h3>`;
+        entry.answers.forEach(a => {
+          div.innerHTML += `<p><strong>${a.q}</strong><br>Answer: ${a.a}</p>`;
+        });
+        container.appendChild(div);
+      });
+
+      const sorted = [...history].sort((a, b) => b.score - a.score);
+      high.innerHTML = sorted.slice(0, 5).map(h => `<p>${h.name} — IQ ${h.score}</p>`).join("");
+      low.innerHTML = sorted.reverse().slice(0, 5).map(h => `<p>${h.name} — IQ ${h.score}</p>`).join("");
+    }
+
+    function retakeQuiz() {
+      generateQuiz();
+    }
+  </script>
+</body>
+</html>
