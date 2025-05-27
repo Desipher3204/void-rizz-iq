@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Void IQ Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: black;
+      color: lime;
+      text-align: center;
+      padding: 2em;
+    }
+    .hidden { display: none; }
+    button {
+      background: lime;
+      color: black;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      padding: 5px;
+      margin-top: 10px;
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Void IQ Test</h1>
+  <div id="quiz"></div>
+  <button onclick="submitQuiz()" id="submitBtn">Submit</button>
+  <button onclick="retakeQuiz()" class="hidden" id="retakeBtn">Retake Quiz</button>
+  <div id="result" class="hidden"></div>
+
+  <script>
+    const questions = [
+      { q: "How many ducks does it take to screw in a lightbulb?", options: ["7", "Banana", "None, ducks don't do that", "Only on Tuesdays"], correct: 2 },
+      { q: "What's the color of noise in a vacuum?", options: ["Ultraviolet", "Silence", "42", "Depends on the mood"], correct: 1 },
+      { q: "Type the meaning of life:", input: true, correct: "42" },
+      { q: "If a tree falls in the forest and no one hears it, how many toes does it have?", options: ["10", "0", "Depends on the forest", "Trees don't have toes"], correct: 3 },
+      { q: "Write something only a genius would say:", input: true, correct: "something only a genius would say" },
+      { q: "How many hot dogs can fit in the sun?", options: ["All of them", "None", "What is a sun?", "17"], correct: 0 },
+      { q: "If your reflection winks at you, what do you do?", options: ["Panic", "Wink back", "Call NASA", "Join it"], correct: 1 },
+      { q: "Spell 'IQ' backwards:", input: true, correct: "QI" },
+      { q: "What weighs more, a kilogram of feathers or a kilogram of steel?", options: ["Feathers", "Steel", "Same", "Depends on gravity"], correct: 2 },
+      { q: "What is 2 + 2?", options: ["Fish", "22", "4", "2+2"], correct: 2 },
+      // Add up to 50 with similar absurdity if needed...
+    ];
+
+    let selected = [];
+
+    function generateQuiz() {
+      document.getElementById("quiz").innerHTML = "";
+      document.getElementById("result").classList.add("hidden");
+      document.getElementById("submitBtn").classList.remove("hidden");
+      document.getElementById("retakeBtn").classList.add("hidden");
+
+      selected = [];
+      const quizDiv = document.getElementById("quiz");
+      const indices = [...Array(questions.length).keys()]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 5);
+
+      indices.forEach(i => {
+        const q = questions[i];
+        selected.push(i);
+        const container = document.createElement("div");
+        container.innerHTML = `<p>${q.q}</p>`;
+
+        if (q.input) {
+          container.innerHTML += `<input type="text" id="q${i}">`;
+        } else {
+          q.options.forEach((opt, j) => {
+            container.innerHTML += `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label><br>`;
+          });
+        }
+
+        quizDiv.appendChild(container);
+      });
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      selected.forEach(i => {
+        const q = questions[i];
+        if (q.input) {
+          const answer = document.getElementById(`q${i}`).value.trim().toLowerCase();
+          if (answer === q.correct.toLowerCase()) score++;
+        } else {
+          const choices = document.getElementsByName(`q${i}`);
+          for (let c of choices) {
+            if (c.checked && parseInt(c.value) === q.correct) {
+              score++;
+              break;
+            }
+          }
+        }
+      });
+
+      const iq = 80 + score * 10; // Fake-ish IQ scaling
+
+      document.getElementById("result").classList.remove("hidden");
+      document.getElementById("submitBtn").classList.add("hidden");
+      document.getElementById("retakeBtn").classList.remove("hidden");
+      document.getElementById("result").innerHTML = `<h2>Your Void IQ is: ${iq}</h2>`;
+    }
+
+    function retakeQuiz() {
+      generateQuiz();
+    }
+
+    generateQuiz();
+  </script>
+</body>
+</html>
