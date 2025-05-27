@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Void IQ Test</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #f5f5f5;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      width: 90vw;
+      margin-top: 20px;
+    }
+    .main {
+      flex: 2;
+      margin-right: 20px;
+    }
+    .sidebar {
+      flex: 1;
+      background-color: #1e1e1e;
+      padding: 10px;
+      border-radius: 10px;
+    }A
+    input:disabled {
+      background-color: #444;
+      color: #ccc;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Void IQ Test</h1>
+  <input type="text" id="name" placeholder="Enter your cursed name" />
+  <button onclick="startQuiz()">Start Quiz</button>
+
+  <div class="container">
+    <div class="main">
+      <div id="quiz"></div>
+      <div id="result"></div>
+      <div id="history"></div>
+    </div>
+    <div class="sidebar">
+      <h3>Highest IQs</h3>
+      <div id="highScores"></div>
+      <h3>Lowest IQs</h3>
+      <div id="lowScores"></div>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      { q: "If you have 4 paint cans and cats can only swim on Mondays, how many hot dogs do you have?", options: {"12": 20, "cheese": 40, "none": 10} },
+      { q: "What color is the smell of math?", options: {"purple": 25, "banana": 35, "7": 15} },
+      { q: "On a scale of purple to banana, rate your last sneeze.", options: {"banana": 10, "purple": 30, "fish": 20} },
+      { q: "If the moon was made of cheese, how many tacos fit in a bus?", options: {"69": 50, "420": 40, "infinite": 60} },
+      { q: "How many ducks can dance on the head of a pin while solving calculus?", options: {"42": 30, "ducks": 25, "Einstein": 45} },
+      { q: "How loud is Tuesday on a scale of yes to spaghetti?", options: {"yes": 30, "spaghetti": 50, "tuesday": 20} },
+      { q: "Convert the square root of broccoli into an emotion.", options: {"happy": 40, "confused": 25, "broccoli": 10} },
+      { q: "If shoes could talk, what language would they scream in?", options: {"Latin": 35, "Shoe-nese": 50, "Screams": 20} },
+      { q: "Rate the temperature of invisible fire.", options: {"cold": 15, "scorching": 45, "blue": 30} },
+      { q: "What’s the square root of a meme?", options: {"vine": 40, "TikTok": 20, "Shrek": 60} },
+      // Add more as needed...
+    ];
+
+    const memeSounds = [
+      'https://www.myinstants.com/media/sounds/vine-boom.mp3',
+      'https://www.myinstants.com/media/sounds/windows-xp-error.mp3',
+      'https://www.myinstants.com/media/sounds/spongebob-fail.mp3',
+      'https://www.myinstants.com/media/sounds/fart-with-reverb.mp3',
+      'https://www.myinstants.com/media/sounds/among-us.mp3'
+    ];
+
+    let username = localStorage.getItem('username');
+    const nameInput = document.getElementById("name");
+
+    if (username) {
+      nameInput.value = username;
+      nameInput.disabled = true;
+    }
+
+    function startQuiz() {
+      if (!username) {
+        const inputName = nameInput.value.trim();
+        if (!inputName) {
+          alert("Enter a cursed name to begin.");
+          return;
+        }
+        username = inputName;
+        localStorage.setItem('username', username);
+        nameInput.disabled = true;
+      }
+
+      const quizDiv = document.getElementById("quiz");
+      const usedIndices = [];
+      while (usedIndices.length < 5) {
+        const i = Math.floor(Math.random() * allQuestions.length);
+        if (!usedIndices.includes(i)) usedIndices.push(i);
+      }
+
+      quizDiv.innerHTML = '';
+      usedIndices.forEach((i, index) => {
+        const question = allQuestions[i];
+        let html = `<p>${question.q}</p>`;
+        Object.keys(question.options).forEach(opt => {
+          html += `<label><input type='radio' name='q${index}' value='${opt}'/>${opt}</label>`;
+        });
+        quizDiv.innerHTML += html + '<br/><br/>';
+      });
+      quizDiv.innerHTML += `<button onclick='submitQuiz(${JSON.stringify(usedIndices)})'>Submit</button>`;
+    }
+
+    function submitQuiz(usedIndices) {
+      let score = 0;
+      const responses = [];
+      usedIndices.forEach((index, i) => {
+        const selected = document.querySelector(`input[name='q${i}']:checked`);
+        const val = selected ? selected.value : "none";
+        const points = allQuestions[index].options[val] || 0;
+        responses.push(val);
+        score += points;
+        const sound = new Audio(memeSounds[Math.floor(Math.random() * memeSounds.length)]);
+        sound.play();
+      });
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `<h2>Your IQ: ${score}</h2><button onclick='startQuiz()'>Retake Quiz</button>`;
+
+      const attempt = { name: username, iq: score, responses };
+      const history = JSON.parse(localStorage.getItem("quizHistory") || "[]");
+      history.push(attempt);
+      localStorage.setItem("quizHistory", JSON.stringify(history));
+      renderHistory();
+      renderLeaderboards();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem("quizHistory") || "[]");
+      const historyDiv = document.getElementById("history");
+      historyDiv.innerHTML = '<h3>Your Quiz History</h3>';
+      history.filter(h => h.name === username).forEach(entry => {
+        historyDiv.innerHTML += `<p>IQ: ${entry.iq} - ${entry.responses.join(', ')}</p>`;
+      });
+    }
+
+    function renderLeaderboards() {
+      const history = JSON.parse(localStorage.getItem("quizHistory") || "[]");
+      const sortedHigh = [...history].sort((a,b) => b.iq - a.iq).slice(0,5);
+      const sortedLow = [...history].sort((a,b) => a.iq - b.iq).slice(0,5);
+      document.getElementById("highScores").innerHTML = sortedHigh.map(e => `<p>${e.name}: ${e.iq}</p>`).join('');
+      document.getElementById("lowScores").innerHTML = sortedLow.map(e => `<p>${e.name}: ${e.iq}</p>`).join('');
+    }
+
+    renderHistory();
+    renderLeaderboards();
+  </script>
+</body>
+</html>
