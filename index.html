@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Void Rizz IQ - Unhinged Quiz</title>
+<style>
+  body { background: #121212; color: #eee; font-family: 'Comic Sans MS', cursive, sans-serif; padding: 20px; }
+  nav { margin-bottom: 20px; }
+  button { margin-right: 10px; padding: 10px 15px; background: #ff007f; border: none; color: #fff; cursor: pointer; border-radius: 5px; }
+  button.active { background: #00ffc3; color: #000; }
+  .hidden { display: none; }
+  .question { margin-bottom: 15px; }
+  label { display: block; margin-top: 5px; cursor: pointer; }
+  .submissions { background: #222; padding: 10px; border-radius: 8px; max-height: 300px; overflow-y: auto; }
+  .submission { border-bottom: 1px solid #444; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <button id="tab-quiz" class="active">Void IQ Quiz</button>
+  <button id="tab-submissions">View Submissions</button>
+</nav>
+
+<div id="quiz-section">
+  <form id="quiz-form">
+    <div class="question">
+      <p>1. If you have 4 paint cans and cats can only swim on Mondays, how many hot dogs do you have?</p>
+      <label><input type="radio" name="q1" value="0" required> 0</label>
+      <label><input type="radio" name="q1" value="4"> 4</label>
+      <label><input type="radio" name="q1" value="69"> 69</label>
+      <label><input type="radio" name="q1" value="Infinity"> Infinity</label>
+    </div>
+    <div class="question">
+      <p>2. What is the color of Tuesday?</p>
+      <label><input type="radio" name="q2" value="Blue" required> Blue</label>
+      <label><input type="radio" name="q2" value="Green"> Green</label>
+      <label><input type="radio" name="q2" value="Invisible"> Invisible</label>
+      <label><input type="radio" name="q2" value="Hot Pink"> Hot Pink</label>
+    </div>
+    <div class="question">
+      <p>3. How many unicorns does it take to change a light bulb?</p>
+      <label><input type="radio" name="q3" value="1" required> 1</label>
+      <label><input type="radio" name="q3" value="0"> 0</label>
+      <label><input type="radio" name="q3" value="42"> 42</label>
+      <label><input type="radio" name="q3" value="Banana"> Banana</label>
+    </div>
+    <button type="submit">Submit My Void IQ</button>
+  </form>
+  <div id="result" style="margin-top:20px;"></div>
+</div>
+
+<div id="submissions-section" class="hidden">
+  <h2>Past Submissions</h2>
+  <div class="submissions" id="submissions-list">
+    <p>No submissions yet. Be the first!</p>
+  </div>
+</div>
+
+<script>
+const quizSection = document.getElementById('quiz-section');
+const submissionsSection = document.getElementById('submissions-section');
+const tabQuiz = document.getElementById('tab-quiz');
+const tabSubs = document.getElementById('tab-submissions');
+const submissionsList = document.getElementById('submissions-list');
+const quizForm = document.getElementById('quiz-form');
+const resultDiv = document.getElementById('result');
+
+let submissions = JSON.parse(localStorage.getItem('voidIQSubs')) || [];
+
+function renderSubmissions() {
+  if(submissions.length === 0) {
+    submissionsList.innerHTML = '<p>No submissions yet. Be the first!</p>';
+    return;
+  }
+  submissionsList.innerHTML = '';
+  submissions.forEach((sub, i) => {
+    const subDiv = document.createElement('div');
+    subDiv.className = 'submission';
+    subDiv.innerHTML = `
+      <strong>Submission #${i + 1}</strong><br/>
+      Q1 answer: ${sub.answers.q1}<br/>
+      Q2 answer: ${sub.answers.q2}<br/>
+      Q3 answer: ${sub.answers.q3}<br/>
+      Void IQ Score: ${sub.score}<br/>
+      <em>${sub.comment}</em>
+    `;
+    submissionsList.appendChild(subDiv);
+  });
+}
+
+function getComment(score) {
+  if(score >= 3) return "Legendary Void Genius!";
+  if(score === 2) return "Pretty Rizz, not bad.";
+  if(score === 1) return "Basic Void Energy.";
+  return "Total rizz disaster.";
+}
+
+quizForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const formData = new FormData(quizForm);
+  const answers = {
+    q1: formData.get('q1'),
+    q2: formData.get('q2'),
+    q3: formData.get('q3')
+  };
+  // Dumb scoring: if answer is 0, 1, 42, etc. — random but consistent nonsense
+  let score = 0;
+  if(['0','Blue','1'].includes(answers.q1)) score++;
+  if(['Blue','Hot Pink'].includes(answers.q2)) score++;
+  if(['1','42'].includes(answers.q3)) score++;
+  
+  const comment = getComment(score);
+  
+  submissions.push({answers, score, comment});
+  localStorage.setItem('voidIQSubs', JSON.stringify(submissions));
+  resultDiv.innerHTML = `<h3>Your Void IQ is ${score}/3</h3><p>${comment}</p>`;
+  quizForm.reset();
+  renderSubmissions();
+  // Switch to submissions tab to flex results
+  tabSubs.click();
+});
+
+// Tab switching
+tabQuiz.addEventListener('click', () => {
+  tabQuiz.classList.add('active');
+  tabSubs.classList.remove('active');
+  quizSection.classList.remove('hidden');
+  submissionsSection.classList.add('hidden');
+});
+tabSubs.addEventListener('click', () => {
+  tabSubs.classList.add('active');
+  tabQuiz.classList.remove('active');
+  submissionsSection.classList.remove('hidden');
+  quizSection.classList.add('hidden');
+  renderSubmissions();
+});
+
+// Initial render submissions on load
+renderSubmissions();
+</script>
+
+</body>
+</html>
