@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Void Rizz IQ</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #f0f0f0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: hotpink;
+      text-shadow: 0 0 10px magenta;
+    }
+    .section {
+      background: #1a1a1a;
+      border: 2px solid hotpink;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 600px;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      background-color: #333;
+      color: #f0f0f0;
+      border: 1px solid #777;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: hotpink;
+      border: none;
+      color: black;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: lime;
+    }
+  </style>
+</head>
+<body>
+  <h1>Void Rizz IQ</h1>
+
+  <div class="section">
+    <h2>Drop Your Pickup Line</h2>
+    <input type="text" id="pickupLine" placeholder="Ex: Are you French? Because Eiffel for you...">
+    <button onclick="rateRizz()">Rate Rizz</button>
+    <div class="result" id="rizzResult"></div>
+  </div>
+
+  <div class="section">
+    <h2>Speak to the Void</h2>
+    <textarea id="voidInput" placeholder="Scream your thoughts here..."></textarea>
+    <button onclick="talkToVoid()">Submit to the Void</button>
+    <div class="result" id="voidResponse"></div>
+  </div>
+
+  <div class="section">
+    <h2>Goblin IQ Quiz</h2>
+    <button onclick="getIQ()">Reveal Your Goblin IQ</button>
+    <div class="result" id="iqResult"></div>
+  </div>
+
+  <script>
+    function rateRizz() {
+      const lines = [
+        "This line has the rizz of a soggy sponge.",
+        "Certified lover move. 10/10.",
+        "Did that line escape from a Tumblr post in 2012?",
+        "Bro... I physically recoiled.",
+        "This rizz is illegal in 3 countries.",
+        "That was disturbingly smooth. Who taught you that?"
+      ];
+      const result = lines[Math.floor(Math.random() * lines.length)];
+      document.getElementById('rizzResult').innerText = result;
+    }
+
+    function talkToVoid() {
+      const responses = [
+        "The void blinks... and screams back.",
+        "You typed that? Bold of you.",
+        "The darkness nods in chaotic agreement.",
+        "You're not alone. There's at least 4 raccoons in your walls.",
+        "It’s giving... emotional tax fraud.",
+        "The Void says: 'touch grass, babe.'"
+      ];
+      const result = responses[Math.floor(Math.random() * responses.length)];
+      document.getElementById('voidResponse').innerText = result;
+    }
+
+    function getIQ() {
+      const titles = [
+        "Certified Void Goblin™",
+        "Rizzless Philosopher",
+        "Sentient Red Flag",
+        "Cursed Genius of the Sewer",
+        "Emotional Support Goblin",
+        "Legally Hot, Morally Questionable"
+      ];
+      const result = titles[Math.floor(Math.random() * titles.length)];
+      document.getElementById('iqResult').innerText = `Result: ${result}`;
+    }
+  </script>
+</body>
+</html>
